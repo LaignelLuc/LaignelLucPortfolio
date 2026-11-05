@@ -12,8 +12,12 @@
   <canvas id="ocean" aria-hidden="true"></canvas>
 
   <header class="zone">
+    <img class="avatar" src="image/pfpPro-avatar.jpg" width="512" height="512" alt="Photo de profil de Luc Laignel">
     <h1>Luc Laignel</h1>
-    <p>Étudiant en BUT Informatique. Je descends dans les détails.</p>
+    <p>
+      Étudiant en 2ème année de BUT Informatique. Passionné d'informatique mais aussi de plongée sous-marine et de jeux-vidéos.
+      Je plonge dans les détails.
+    </p>
   </header>
 
   <section class="zone" id="projects">
@@ -28,8 +32,46 @@
 
   <section class="zone" id="contact">
     <h2>Contact</h2>
-    <p>luc@exemple.fr</p>
+    <p>laignelluc@gmail.com</p>
+    <p>+33 07 69 06 08 08</p>
+    <a href="https://www.linkedin.com/in/luc-laignel-a226373b3/">LinkedIn : Laignel Luc</a>
   </section>
+
+  <button class="to-top" type="button" aria-label="Retour en haut" title="Retour en haut">
+    <svg viewBox="0 0 72 150" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="dsmbBody" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#ff7a52"/>
+          <stop offset="0.3" stop-color="#ff5238"/>
+          <stop offset="0.72" stop-color="#e52c22"/>
+          <stop offset="1" stop-color="#b51b17"/>
+        </linearGradient>
+        <linearGradient id="dsmbBand" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f4f8f8"/>
+          <stop offset="1" stop-color="#b9c5c9"/>
+        </linearGradient>
+        <linearGradient id="dsmbMetal" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#eef4f5"/>
+          <stop offset="0.5" stop-color="#98a7ad"/>
+          <stop offset="1" stop-color="#e3ecee"/>
+        </linearGradient>
+      </defs>
+      <path d="M18 10 H54 Q64 10 64 20 V101 Q64 116 51 121 H21 Q8 116 8 101 V20 Q8 10 18 10 Z" fill="url(#dsmbBody)" stroke="#6f120f" stroke-width="2"/>
+      <path d="M10 20 Q10 12 18 12 H54 Q62 12 62 20 V28 H10 Z" fill="url(#dsmbBand)" stroke="#94a3a8" stroke-width="1.2"/>
+      <path d="M10 28 H62" stroke="#821712" stroke-width="1.2" opacity=".6"/>
+      <path d="M17 35 C14 59 14 83 19 104" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M55 36 C58 60 58 82 52 102" fill="none" stroke="rgba(80,0,0,.16)" stroke-width="4" stroke-linecap="round"/>
+      <path d="M36 43 L48 58 H41 V77 H31 V58 H24 Z" fill="#fff8f2" opacity=".95"/>
+      <circle cx="36" cy="107" r="3.4" fill="#171b1d"/>
+      <circle cx="36" cy="107" r="1.2" fill="#9fadb2"/>
+      <path d="M26 118 L23 128" stroke="#1b1e20" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M46 118 L49 128" stroke="#1b1e20" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M23 128 Q36 138 49 128" fill="none" stroke="#1b1e20" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="36" cy="135" r="5" fill="none" stroke="#171a1c" stroke-width="3"/>
+      <rect x="31" y="139" width="10" height="9" rx="3" fill="none" stroke="url(#dsmbMetal)" stroke-width="2.2"/>
+      <path d="M36 139 V148" stroke="#c4d0d4" stroke-width="1.2" opacity=".8"/>
+    </svg>
+  </button>
 
   <script type="importmap">
   { "imports": {

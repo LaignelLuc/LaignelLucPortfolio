@@ -38,6 +38,21 @@ body {
   padding: 3rem max(var(--gutter), env(safe-area-inset-right)) 3rem max(var(--gutter), env(safe-area-inset-left));
 }
 
+.avatar {
+  display: block;
+  width: clamp(150px, 18.7vw, 187px);
+  height: auto;
+  aspect-ratio: 1;
+  margin-bottom: 1.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(239, 253, 255, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(2, 12, 24, 0.18),
+    0 12px 28px rgba(2, 12, 24, 0.24);
+  background: rgba(239, 253, 255, 0.15);
+}
+
 h1 { font-size: clamp(2.5rem, 13vw, 4.5rem); font-weight: 700; line-height: 1; }
 h2 { font-size: clamp(1.75rem, 8vw, 3rem); font-weight: 700; line-height: 1.1; }
 
@@ -48,8 +63,86 @@ p {
   max-width: 40ch;
 }
 
+h1, h2, p {
+  text-shadow: 0 1px 2px rgba(0, 8, 14, 0.2);
+}
+
 /* Cibles tactiles confortables pour les futurs liens/boutons */
 a, button { min-height: 44px; min-width: 44px; }
+
+a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- DSMB back-to-top ---------- */
+.to-top {
+  position: fixed;
+  right: max(1.25rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 4;
+  width: clamp(3rem, 5vw, 4rem);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  line-height: 0;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.94);
+  filter: drop-shadow(0 12px 18px rgba(2, 12, 24, 0.38));
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s linear 0.25s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s;
+}
+
+.to-top svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.to-top:hover,
+.to-top:focus-visible {
+  transform: translateY(-6px) scale(1.04);
+}
+
+.to-top:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.to-top:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 6px;
+  border-radius: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .to-top {
+    transition: none;
+  }
+}
 
 /* ---------- Tablette ---------- */
 @media (min-width: 48em) {
