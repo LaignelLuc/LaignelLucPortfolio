@@ -1,0 +1,70 @@
+/* ---------- Base (mobile first) ---------- */
+:root {
+  --bg: #7bc9da;
+  --fg: #06222e;
+  --gutter: 1.25rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--fg);
+  overflow-x: hidden;
+}
+
+#ocean {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.zone {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;   /* fallback */
+  min-height: 100svh;  /* évite le saut de la barre d'adresse mobile */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem max(var(--gutter), env(safe-area-inset-right)) 3rem max(var(--gutter), env(safe-area-inset-left));
+}
+
+h1 { font-size: clamp(2.5rem, 13vw, 4.5rem); font-weight: 700; line-height: 1; }
+h2 { font-size: clamp(1.75rem, 8vw, 3rem); font-weight: 700; line-height: 1.1; }
+
+p {
+  margin-top: 1rem;
+  font-size: 1.05rem;
+  font-weight: 300;
+  max-width: 40ch;
+}
+
+/* Cibles tactiles confortables pour les futurs liens/boutons */
+a, button { min-height: 44px; min-width: 44px; }
+
+/* ---------- Tablette ---------- */
+@media (min-width: 48em) {
+  :root { --gutter: 3rem; }
+
+  h1 { font-size: clamp(4rem, 9vw, 6rem); }
+  h2 { font-size: clamp(2.5rem, 5vw, 3.5rem); }
+  p  { font-size: 1.2rem; }
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width: 64em) {
+  :root { --gutter: 8rem; }
+
+  .zone { max-width: 60rem; }
+  h1 { font-size: 7rem; }
+  h2 { font-size: 4rem; }
+}

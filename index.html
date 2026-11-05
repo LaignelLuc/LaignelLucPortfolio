@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Luc Laignel – Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="ocean" aria-hidden="true"></canvas>
+
+  <header class="zone">
+    <h1>Luc Laignel</h1>
+    <p>Étudiant en BUT Informatique. Je descends dans les détails.</p>
+  </header>
+
+  <section class="zone" id="projects">
+    <h2>Projets</h2>
+    <p>Tes SAÉ : développement, réseau, données.</p>
+  </section>
+
+  <section class="zone" id="skills">
+    <h2>Compétences</h2>
+    <p>Python, JavaScript, SQL, réseau.</p>
+  </section>
+
+  <section class="zone" id="contact">
+    <h2>Contact</h2>
+    <p>luc@exemple.fr</p>
+  </section>
+
+  <script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
