@@ -11,6 +11,42 @@
 <body>
   <canvas id="ocean" aria-hidden="true"></canvas>
 
+  <div class="foreground-reef" aria-hidden="true">
+    <svg class="reef-sprite" aria-hidden="true" focusable="false">
+      <defs>
+        <path id="coralShape" d="
+          M-58 0 H58
+          M0 0 C-6 -38 -8 -86 -2 -138
+          M-2 -36 C-42 -64 -68 -94 -84 -132
+          M-2 -92 C-36 -122 -54 -158 -62 -198
+          M-2 -58 C34 -86 60 -118 74 -154
+          M-2 -128 C22 -154 42 -184 50 -218
+          M-62 -198 C-78 -226 -96 -246 -118 -258
+          M-62 -198 C-42 -228 -28 -248 -18 -272
+          M74 -154 C94 -176 114 -190 136 -198
+          M50 -218 C66 -240 86 -254 108 -262
+          M-18 -272 C-26 -288 -38 -300 -52 -308
+          M108 -262 C120 -274 134 -280 148 -282
+          M-84 -132 C-104 -148 -124 -156 -144 -160
+          M-40 -47 C-72 -63 -96 -79 -116 -99
+          M0 -22 C24 -48 46 -68 68 -84
+        " fill="none" stroke="currentColor" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+      </defs>
+    </svg>
+
+    <svg class="reef-corner reef-left" viewBox="0 0 600 560" aria-hidden="true" focusable="false">
+      <use href="#coralShape" style="color:#f08a6c" transform="translate(210 560) rotate(8)"/>
+      <use href="#coralShape" style="color:#e76f51" transform="translate(100 500) rotate(32) scale(0.82)"/>
+      <use href="#coralShape" style="color:#f2a37f" transform="translate(-10 430) rotate(56) scale(0.68)"/>
+    </svg>
+
+    <svg class="reef-corner reef-right" viewBox="0 0 600 560" aria-hidden="true" focusable="false">
+      <use href="#coralShape" style="color:#e8614d" transform="translate(390 560) rotate(-8)"/>
+      <use href="#coralShape" style="color:#ef7d72" transform="translate(500 500) rotate(-32) scale(0.82)"/>
+      <use href="#coralShape" style="color:#f4a07a" transform="translate(610 430) rotate(-56) scale(0.68)"/>
+    </svg>
+  </div>
+
   <header class="zone">
     <img class="avatar" src="image/pfpPro-avatar.jpg" width="512" height="512" alt="Photo de profil de Luc Laignel">
     <h1>Luc Laignel</h1>
@@ -20,10 +56,13 @@
     </p>
   </header>
 
-  <section class="zone" id="projects">
+  <section class="zone zone--projects" id="projects">
+    <p class="section-eyebrow">01 <span aria-hidden="true">—</span> Projets</p>
     <h2>Projets</h2>
-    <p>Tes SAÉ : développement, réseau, données.</p>
+    <p class="section-lede">Trois projets, trois drones. Chaque drone projette son hologramme : cliquez pour ouvrir le projet.</p>
   </section>
+
+  <div class="drone-hotspots" id="drone-hotspots" role="group" aria-label="Projets en drone"></div>
 
   <section class="zone" id="skills">
     <h2>Compétences</h2>
@@ -36,6 +75,51 @@
     <p>+33 07 69 06 08 08</p>
     <a href="https://www.linkedin.com/in/luc-laignel-a226373b3/">LinkedIn : Laignel Luc</a>
   </section>
+
+  <dialog class="project-window" id="project-window" aria-labelledby="project-window-title" aria-describedby="project-window-subtitle">
+    <div class="project-window__veil" data-close></div>
+    <div class="project-window__beam" aria-hidden="true"></div>
+    <div class="project-window__panel" tabindex="-1">
+      <header class="project-window__bar">
+        <p class="project-window__signal">
+          <span class="project-window__pulse" aria-hidden="true"></span>
+          <span id="project-window-link">Liaison drone 01</span>
+        </p>
+        <button class="project-window__close" type="button" aria-label="Fermer le projet">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="project-window__body">
+        <div class="project-window__screen" id="project-window-screen" aria-hidden="true"></div>
+
+        <div class="project-window__info">
+          <p class="project-window__meta">
+            <span id="project-window-number">01</span>
+            <span class="project-window__meta-sep" aria-hidden="true">/</span>
+            <span id="project-window-category">Développement web</span>
+            <span class="project-window__meta-sep" aria-hidden="true">/</span>
+            <span id="project-window-year">2025</span>
+          </p>
+          <h3 id="project-window-title">Carnet de plongée</h3>
+          <p class="project-window__subtitle" id="project-window-subtitle"></p>
+          <p class="project-window__description" id="project-window-description"></p>
+          <ul class="project-window__stack" id="project-window-stack"></ul>
+          <p class="project-window__note">
+            <span aria-hidden="true">◇</span>
+            Aperçu à venir — l'écran du projet sera branché ici.
+          </p>
+        </div>
+      </div>
+
+      <footer class="project-window__footer">
+        <span class="project-window__status"><span aria-hidden="true">◦</span> Fenêtre ouverte depuis le drone</span>
+        <span class="project-window__hint">Échap pour fermer</span>
+      </footer>
+    </div>
+  </dialog>
 
   <button class="to-top" type="button" aria-label="Retour en haut" title="Retour en haut">
     <svg viewBox="0 0 72 150" aria-hidden="true" focusable="false">

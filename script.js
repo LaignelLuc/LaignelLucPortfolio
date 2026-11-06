@@ -6,7 +6,10 @@ import { createSeafloor } from "./src/seafloor.js";
 import { ABYSS_BAND, bandVisibility } from "./src/species.js";
 import { createMarineLife } from "./src/marine-life.js";
 import { initBackToTop } from "./src/back-to-top.js";
-
+import { createForegroundReef } from "./src/foreground-reef.js";
+import { PROJECTS } from "./src/projects.js";
+import { createDroneFleet } from "./src/drone-fleet.js";
+import { createProjectWindow } from "./src/project-window.js";
 // --- Scene
 const canvas = document.getElementById("ocean");
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -33,7 +36,15 @@ scene.add(seafloor.group);
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const marineLife = createMarineLife({ scene, camera, reduceMotion });
+const foregroundReef = createForegroundReef();
 
+const projectWindow = createProjectWindow();
+const droneFleet = createDroneFleet({
+  scene,
+  camera,
+  projects: PROJECTS,
+  projectWindow,
+});
 // --- Scroll -> depth
 let progress = 0;
 function onScroll() {
@@ -42,6 +53,7 @@ function onScroll() {
   const { bg, fg } = colorsAt(progress);
   document.documentElement.style.setProperty("--bg", `#${bg.getHexString()}`);
   document.documentElement.style.setProperty("--fg", `#${fg.getHexString()}`);
+  foregroundReef.update(progress);
 }
 addEventListener("scroll", onScroll, { passive: true });
 
@@ -66,12 +78,18 @@ renderer.setAnimationLoop(() => {
 
   // Camera dives with the scroll
   camera.position.y = -progress * 6;
+  camera.updateMatrixWorld();
+  camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+
   bubbles.update(dt, t, camera.position.y, reduceMotion);
   sunRays.update(t, progress, camera.position.y, reduceMotion);
 
   const abyss = bandVisibility(ABYSS_BAND, progress);
   seafloor.setOpacity(abyss);
   marineLife.update(dt, t, progress);
+  droneFleet.update(dt, t);
 
   renderer.render(scene, camera);
 });
+
+addEventListener("pagehide", () => droneFleet.destroy(), { once: true });
