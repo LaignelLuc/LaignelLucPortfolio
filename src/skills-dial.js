@@ -114,14 +114,18 @@ function buildDial() {
     group.append(svg("circle", { cx: bx, cy: by, r: 9, class: "dial__pulse" }));
     group.append(svg("circle", { cx: bx, cy: by, r: 5, class: "dial__beacon" }));
 
-    // étiquette, posée vers l'extérieur du disque
-    const [lx, ly] = polar(BEACON_RADIUS + 54, family.angle);
-    const sin = Math.sin(((family.angle - 90) * Math.PI) / 180);
-    const anchor = Math.abs(sin) > 0.5 ? (sin > 0 ? "start" : "end") : "middle";
+    // étiquette : collée au halo, du côté opposé au centre, jamais par-dessus
+    // les satellites. Elle s'étend vers l'extérieur (gauche/droite) ou se
+    // centre au-dessus/en dessous selon l'axe dominant du cap.
+    const rad = (family.angle * Math.PI) / 180;
+    const ux = Math.sin(rad);
+    const uy = -Math.cos(rad);
+    const gap = SAT_RADIUS + 10;
+    const horizontal = Math.abs(ux) >= Math.abs(uy);
     const label = svg("text", {
-      x: lx,
-      y: anchor === "middle" ? ly - 10 : ly,
-      "text-anchor": anchor,
+      ...(horizontal
+        ? { x: bx + (ux < 0 ? -gap : gap), y: by, "text-anchor": ux < 0 ? "end" : "start" }
+        : { x: bx, y: by + (uy < 0 ? -(gap + 10) : gap + 12), "text-anchor": "middle" }),
       "dominant-baseline": "middle",
       class: "dial__label",
     });
