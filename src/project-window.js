@@ -2,6 +2,7 @@ const SCREEN_URLS = {
   retro: "retro-pc.luc-laignel.fr",
   biosphere: "biosphere.luc-laignel.fr",
   algo: "algo.luc-laignel.fr",
+  nextcloud: "nextcloud.luc-laignel.fr",
 };
 
 const WEB_SCREEN = `
@@ -110,6 +111,38 @@ const BIOSPHERE_SCREEN = `
   </div>
 `;
 
+const NEXTCLOUD_SCREEN = `
+  <div class="mock-app mock-app--carousel">
+    <div class="mock-app__top">
+      <span>Wiki du projet</span>
+      <span class="mock-app__button">SAE Réseau</span>
+    </div>
+    <div class="mock-carousel" data-carousel>
+      <div class="mock-carousel__stage">
+        <img class="mock-carousel__image is-active" src="image/nextcloud-vm.webp"
+          alt="Poste client virtuel avec la fenêtre de connexion Nextcloud"
+          data-caption="Machines virtuelles — poste client" decoding="async">
+        <img class="mock-carousel__image" src="image/nextcloud-install.webp"
+          alt="Terminal Debian pendant l'installation de snapd"
+          data-caption="Installation du serveur — snap" decoding="async">
+        <img class="mock-carousel__image" src="image/nextcloud-apps.webp"
+          alt="Applications et sécurité du serveur Nextcloud"
+          data-caption="Nextcloud — applications et sécurité" decoding="async">
+        <button class="mock-carousel__arrow mock-carousel__arrow--prev" type="button"
+          data-carousel-prev aria-label="Image précédente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="mock-carousel__arrow mock-carousel__arrow--next" type="button"
+          data-carousel-next aria-label="Image suivante">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <span class="mock-carousel__count" aria-live="polite">1 / 3</span>
+      </div>
+      <p class="mock-carousel__caption">Machines virtuelles — poste client</p>
+    </div>
+  </div>
+`;
+
 const SCREENS = {
   web: WEB_SCREEN,
   network: NETWORK_SCREEN,
@@ -117,6 +150,7 @@ const SCREENS = {
   algo: ALGO_SCREEN,
   biosphere: BIOSPHERE_SCREEN,
   retro: RETRO_SCREEN,
+  nextcloud: NEXTCLOUD_SCREEN,
 };
 
 function screenMarkup(kind, url) {
@@ -162,6 +196,31 @@ export function createProjectWindow() {
   let trigger = null;
   let origin = { x: 0, y: 0 };
   let closing = false;
+
+  // The project screen is re-populated on every open, so one delegated click
+  // listener is enough for every carousel arrow the screen may contain.
+  screen.addEventListener("click", (event) => {
+    const control = event.target.closest?.("[data-carousel-prev], [data-carousel-next]");
+    if (!control) return;
+    const carousel = control.closest("[data-carousel]");
+    if (!carousel) return;
+    const images = Array.from(carousel.querySelectorAll(".mock-carousel__image"));
+    if (!images.length) return;
+    const current = Math.max(
+      0,
+      images.findIndex((image) => image.classList.contains("is-active"))
+    );
+    const next =
+      (current + (control.hasAttribute("data-carousel-next") ? 1 : -1) + images.length) %
+      images.length;
+    images.forEach((image, index) => {
+      image.classList.toggle("is-active", index === next);
+    });
+    const count = carousel.querySelector(".mock-carousel__count");
+    const caption = carousel.querySelector(".mock-carousel__caption");
+    if (count) count.textContent = `${next + 1} / ${images.length}`;
+    if (caption) caption.textContent = images[next].dataset.caption || "";
+  });
 
   function populate(project) {
     dialog.style.setProperty("--accent", project.accent);

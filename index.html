@@ -59,14 +59,25 @@
   <section class="zone zone--projects" id="projects">
     <p class="section-eyebrow">01 <span aria-hidden="true">—</span> Projets</p>
     <h2>Projets</h2>
-    <p class="section-lede">Trois projets, trois drones. Chaque drone projette son hologramme : cliquez pour ouvrir le projet.</p>
+    <p class="section-lede">Quatre projets, quatre drones. Chaque drone projette son hologramme : cliquez pour ouvrir le projet.</p>
   </section>
 
   <div class="drone-hotspots" id="drone-hotspots" role="group" aria-label="Projets en drone"></div>
 
-  <section class="zone" id="skills">
-    <h2>Compétences</h2>
-    <p>Python, JavaScript, SQL, réseau.</p>
+  <section class="zone zone--skills" id="skills" aria-labelledby="skills-title">
+    <div class="skills-intro">
+      <p class="section-eyebrow">02 <span aria-hidden="true">—</span> Compétences</p>
+      <h2 id="skills-title">Compétences</h2>
+      <p class="section-lede">
+        Cinq familles, un contact par famille. Chacune ouvre son inventaire :
+        les outils qui s'y rattachent, et les SAE où ils ont servi.
+      </p>
+      <p class="skills-meta"><span data-skills-count>24</span> compétences, aucune hiérarchie</p>
+    </div>
+
+    <div class="skills-scope" data-skills-scope></div>
+
+    <ul class="skills-list" data-skills-list></ul>
   </section>
 
   <section class="zone" id="contact">
@@ -93,7 +104,7 @@
       </header>
 
       <div class="project-window__body">
-        <div class="project-window__screen" id="project-window-screen" aria-hidden="true"></div>
+        <div class="project-window__screen" id="project-window-screen"></div>
 
         <div class="project-window__info">
           <p class="project-window__meta">

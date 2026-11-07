@@ -48,8 +48,8 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const reducedMotion = reduceMotion.matches;
   const glowTexture = createGlowTexture();
-  const baseYaw = [-0.3, 0.24, -0.14];
-  const basePitch = [0.04, -0.02, 0.03];
+  const baseYaw = [-0.3, 0.24, -0.14, 0.18];
+  const basePitch = [0.04, -0.02, 0.03, -0.01];
 
   const drones = projects.map((project, index) => {
     const built = buildDrone({
@@ -176,17 +176,27 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
 
   function slotLayout() {
     const mobile = vw < 768;
-    const fraction = mobile ? 0.46 : vw > 1100 ? 0.22 : 0.26;
+    const desktop = vw > 1100;
+    const fraction = mobile ? 0.46 : desktop ? 0.2 : 0.24;
     const slots = mobile
       ? [
-          { x: 0.26, y: 0.5, depth: 6.2, size: 0.94 },
-          { x: 0.74, y: 0.54, depth: 6.6, size: 0.94 },
-          { x: 0.5, y: 0.8, depth: 5.9, size: 0.86 },
+          { x: 0.26, y: 0.47, depth: 6.2, size: 0.94 },
+          { x: 0.74, y: 0.49, depth: 6.6, size: 0.94 },
+          { x: 0.26, y: 0.79, depth: 6.0, size: 0.9 },
+          { x: 0.74, y: 0.81, depth: 6.3, size: 0.9 },
+        ]
+      : desktop
+      ? [
+          { x: 0.14, y: 0.56, depth: 6.3, size: 1 },
+          { x: 0.38, y: 0.54, depth: 7.1, size: 1.04 },
+          { x: 0.62, y: 0.56, depth: 6.5, size: 1 },
+          { x: 0.86, y: 0.545, depth: 6.8, size: 1.02 },
         ]
       : [
-          { x: 0.215, y: 0.56, depth: 6.3, size: 1 },
-          { x: 0.5, y: 0.535, depth: 7.1, size: 1.08 },
-          { x: 0.785, y: 0.57, depth: 6.5, size: 1 },
+          { x: 0.26, y: 0.45, depth: 6.6, size: 0.95 },
+          { x: 0.74, y: 0.47, depth: 6.9, size: 0.95 },
+          { x: 0.26, y: 0.82, depth: 6.3, size: 0.92 },
+          { x: 0.74, y: 0.84, depth: 6.6, size: 0.92 },
         ];
     return { mobile, fraction, slots };
   }
@@ -295,7 +305,7 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     const height = Math.max(110, bottom - top);
     let left = centerX - width / 2;
     left = clamp(left, 8, vw - width - 8);
-    const topClamped = clamp(top, 8, vh - height - 8);
+    const topClamped = clamp(top, 8, Math.max(8, vh - 72));
 
     const roundedW = Math.round(width);
     const roundedH = Math.round(height);

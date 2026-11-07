@@ -43,4 +43,18 @@ export const PROJECTS = [
     screen: "algo",
     drone: { variant: 2 },
   },
+  {
+    id: "nextcloud",
+    number: "04",
+    title: "Nextcloud en réseau virtuel",
+    category: "Réseau & systèmes",
+    year: "2026",
+    subtitle: "Un serveur auto-hébergé, du réseau virtuel aux postes clients.",
+    description:
+      "Mise en place d'un réseau virtuel de deux sous-réseaux /24 (routeur, clients, serveur) puis installation et configuration d'un serveur Nextcloud sous Debian : HTTPS, TOTP, groupes et quotas, partages protégés. Intégration d'OnlyOffice, de plugins collaboratifs et de la synchronisation de bureau sur les postes clients.",
+    stack: ["Debian", "Nextcloud", "Réseau", "OnlyOffice"],
+    accent: "#d9c2ff",
+    screen: "nextcloud",
+    drone: { variant: 3 },
+  },
 ];

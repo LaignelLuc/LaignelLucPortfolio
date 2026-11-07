@@ -420,6 +420,31 @@ export function buildDrone({ accent, variant = 0, glowTexture }) {
         );
       }
     }
+  } else if (variant === 3) {
+    // Two large side fans plus two compact rear outriggers: the heavy-lift
+    // server drone of the fleet.
+    for (const side of [-1, 1]) {
+      pods.push(
+        addPod(root, materials, {
+          sign: side,
+          x: side * 0.62,
+          y: -0.01,
+          z: 0.06,
+          radius: 0.215,
+          spin: (side > 0 ? 1 : -1) * 10,
+        })
+      );
+      pods.push(
+        addPod(root, materials, {
+          sign: side,
+          x: side * 0.34,
+          y: 0,
+          z: -0.52,
+          radius: 0.115,
+          spin: (side > 0 ? 1 : -1) * 14,
+        })
+      );
+    }
   } else {
     for (const side of [-1, 1]) {
       for (const [z, radius] of [

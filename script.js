@@ -10,6 +10,7 @@ import { createForegroundReef } from "./src/foreground-reef.js";
 import { PROJECTS } from "./src/projects.js";
 import { createDroneFleet } from "./src/drone-fleet.js";
 import { createProjectWindow } from "./src/project-window.js";
+import { createSkillsSection } from "./src/skills-dial.js";
 // --- Scene
 const canvas = document.getElementById("ocean");
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -39,6 +40,7 @@ const marineLife = createMarineLife({ scene, camera, reduceMotion });
 const foregroundReef = createForegroundReef();
 
 const projectWindow = createProjectWindow();
+createSkillsSection(document.getElementById("skills"));
 const droneFleet = createDroneFleet({
   scene,
   camera,
