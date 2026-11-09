@@ -49,7 +49,7 @@ src/                 one module per feature
   skills.js          skill families, their items and evidence lines
   skills-dial.js     sonar dial, hover card and mobile list
   section-nav.js     dock navigation, active section and companion wiring
-  diver-companion.js procedural Three.js diver above the dock
+  diver-companion.js procedural Three.js diver beside the dock
 image/               project screenshots and the avatar
   logos/             monochrome brand marks used by the skill card
 model/               GLB fish loaded by marine-life.js
@@ -70,22 +70,23 @@ Projets, a sonar for Compétences and an envelope for Contact. Their labels rise
 in a bubble just above the icon on hover and keyboard focus. Without JavaScript
 the links still jump to their sections.
 
-On large desktops (at least 80rem wide and 46rem tall) the dock stretches tall
-enough to spread the four icons over most of the viewport height. The little
-scuba diver rides in the same right gutter, just left of the dock, and centres
-itself on the icon of the section being read; it glides to the next icon when the
-active section changes, so the travel between sections is visible. The diver is
-procedural Three.js (`src/diver-companion.js`), not a GLB. Its tag tracks the
-current section; it kicks more gently while the page moves and tilts with the
-scroll direction. Its suit, tank and accents are dimmed by scroll depth to match
-the fish bands. It renders a static pose under `prefers-reduced-motion: reduce`.
+On large desktops (at least 90rem wide and 48rem tall) the dock keeps its
+compact size and sits a little higher, so the diver can ride beside it without
+covering the fourth project card. The little scuba diver rides in the same right
+gutter, just left of the dock, and centres itself on the icon of the section
+being read; it glides to the next icon when the active section changes, so the
+travel between sections is visible. The diver is procedural Three.js
+(`src/diver-companion.js`), not a GLB. Its tag tracks the current section; it
+kicks more gently while the page moves and tilts with the scroll direction. Its
+suit, tank and accents are dimmed by scroll depth to match the fish bands. It
+renders a static pose under `prefers-reduced-motion: reduce`.
 
-Between 1024 px and the long-desktop breakpoint the dock stays compact in the
-right gutter and the diver is hidden. Below 1024 px the dock moves to the bottom
-centre, the diver and the back-to-top button are hidden, and the dock's Accueil
-item returns to the top. The dock and diver are hidden while a project window is
-open. To add a section, add its id to the dock with `data-nav` and put
-`data-nav-section` on the section.
+Between 1024 px and 90rem the dock stays compact in the right gutter and the
+diver is hidden. Below 1024 px the dock moves to the bottom centre, the diver
+and the back-to-top button are hidden, and the dock's Accueil item returns to
+the top. The dock and diver are hidden while a project window is open. To add a
+section, add its id to the dock with `data-nav` and put `data-nav-section` on
+the section.
 
 ## Project drones
 

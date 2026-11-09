@@ -1893,7 +1893,7 @@ html.has-project-window .to-top {
 .diver {
   position: fixed;
   top: 0;
-  right: calc(max(1.5rem, env(safe-area-inset-right)) + 5.8rem);
+  right: calc(max(1.5rem, env(safe-area-inset-right)) + 11rem);
   z-index: 5;
   width: 7.5rem;
   pointer-events: none;
@@ -1975,9 +1975,9 @@ html.has-project-window .diver {
   }
 }
 
-/* Le plongeur accompagne le dock long, réservé aux grands écrans :
+/* Le plongeur accompagne le dock compact, réservé aux grands écrans :
    en dessous, il n'y a pas la place de le glisser entre le contenu et le dock. */
-@media (max-width: 79.99em), (max-height: 45.99em) {
+@media (max-width: 89.99em), (max-height: 47.99em) {
   .diver {
     display: none;
   }
@@ -2051,56 +2051,18 @@ html.has-project-window .diver {
   }
 }
 
-/* ---------- Dock long et plongeur le long du dock ---------- */
-/* Sur grand écran, le dock s'étire pour que le plongeur ait de la place pour
-   nager d'une icône à l'autre. Il se cale à gauche du dock, à hauteur de
-   l'icône de la section active (voir placeDiver dans section-nav.js). */
-@media (min-width: 80em) and (min-height: 46em) {
+/* ---------- Dock compact, plongeur à côté ---------- */
+/* Le dock garde sa taille d'origine. On le remonte légèrement pour que le
+   plongeur, centré sur l'icône active, ne recouvre pas la quatrième carte
+   projet. La valeur change avec la hauteur de la fenêtre. */
+@media (min-width: 90em) and (min-height: 56.25em) {
   .dock {
-    top: 10vh;
-    transform: none;
-    height: min(56vh, 34rem);
+    top: calc(50% - 6.5rem);
   }
+}
 
-  /* The four icons are nudged off the even flex grid: the file has to stay
-     high enough to clear the fourth project card, while the sonar drops
-     below the skills dial's right-hand label. */
-  .dock__item:nth-child(1) {
-    transform: translateY(2.2vh);
-  }
-
-  .dock__item:nth-child(2) {
-    transform: translateY(-0.1vh);
-  }
-
-  .dock__item:nth-child(3) {
-    transform: translateY(4.2vh);
-  }
-
-  .dock__item:nth-child(4) {
-    transform: translateY(-0.4vh);
-  }
-
-  .dock__list {
-    height: 100%;
-    justify-content: space-between;
-  }
-
-  .dock__tip {
-    right: auto;
-    left: 50%;
-    bottom: calc(100% + 0.45rem);
-    transform: translate(-50%, 0.35rem);
-  }
-
-  .dock__link:hover .dock__tip,
-  .dock__link:focus-visible .dock__tip {
-    transform: translate(-50%, 0);
-  }
-
-  .dock__tip::after {
-    right: auto;
-    left: 50%;
-    margin-left: -0.275rem;
+@media (min-width: 90em) and (min-height: 48em) and (max-height: 56.24em) {
+  .dock {
+    top: calc(50% - 6.625rem);
   }
 }

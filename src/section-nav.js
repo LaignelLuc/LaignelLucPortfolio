@@ -1,7 +1,7 @@
 import { createDiverCompanion } from "./diver-companion.js";
 
 const DESKTOP_QUERY = "(min-width: 64em)";
-const COMPANION_QUERY = "(min-width: 80em) and (min-height: 46em)";
+const COMPANION_QUERY = "(min-width: 90em) and (min-height: 48em)";
 const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
