@@ -75,6 +75,11 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
       `Ouvrir le projet ${project.title} — ${project.category}, ${project.year}`
     );
     button.tabIndex = -1;
+    // Start hidden: the buttons are created before the first layout pass, and
+    // an unplaced 280x300 hit area would sit at the top-left of the viewport,
+    // silently swallowing clicks there (and queueing a project that opens only
+    // once the section scrolls into view).
+    button.hidden = true;
     container.appendChild(button);
 
     const drone = {
@@ -232,14 +237,18 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
   }
 
   function openDrone(drone) {
-    if (active || destroyed) return;
+    // One project at a time. A second tap while a drone is docking is ignored
+    // here rather than by disabling the hit areas: that way it can never fall
+    // through to the page, where a mobile browser may read it as a double-tap
+    // zoom on the content behind. A project can only be opened from a drone
+    // that is actually on screen and interactive.
+    if (active || destroyed || !drone.hotspotShown) return;
     active = drone;
     drone.state = "opening";
     drone.focusT = 0;
     drone.hovered = false;
     windowOpened = false;
     drone.button.setAttribute("aria-expanded", "true");
-    container.classList.add("is-busy");
   }
 
   function startClose(drone) {
@@ -247,7 +256,6 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     drone.state = "closing";
     drone.button.setAttribute("aria-expanded", "false");
     drone.button.tabIndex = 0;
-    container.classList.remove("is-busy");
   }
 
   function updateHologram(drone, time, dt) {

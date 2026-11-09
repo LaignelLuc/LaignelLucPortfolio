@@ -7,7 +7,13 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* The drone hit areas are invisible and cover the projects screen, so a
+     stray double tap must never zoom the page. Pinch zoom stays available
+     for accessibility. */
+  touch-action: manipulation;
+}
 
 body {
   font-family: "Bricolage Grotesque", system-ui, sans-serif;
@@ -268,6 +274,10 @@ a:hover {
   font: inherit;
   cursor: pointer;
   pointer-events: auto;
+  /* Vertical scrolling stays possible through the transparent hit area, but a
+     gesture started on a drone can neither pinch-zoom nor double-tap zoom the
+     page. Both are almost always accidental on an invisible full-size target. */
+  touch-action: pan-y;
   will-change: transform, width, height;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -296,10 +306,6 @@ a:hover {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
   border-color: var(--accent);
-}
-
-.drone-hotspots.is-busy .drone-hotspot {
-  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
