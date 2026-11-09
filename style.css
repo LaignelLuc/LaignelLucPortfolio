@@ -9,10 +9,11 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  /* The drone hit areas are invisible and cover the projects screen, so a
-     stray double tap must never zoom the page. Pinch zoom stays available
-     for accessibility. */
-  touch-action: manipulation;
+  /* The site is an immersive, viewport-sized scene: an accidental pinch or
+     double tap (easy on the large invisible drone hit areas) rescales the
+     whole page and is very hard to undo. Keep vertical panning and all
+     buttons/links working, but never let the page zoom on a touch gesture. */
+  touch-action: pan-y;
 }
 
 body {
