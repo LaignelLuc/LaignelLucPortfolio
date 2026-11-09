@@ -32,6 +32,7 @@ src/                 one module per feature
   bubbles.js         bubble field and glass-bubble shader
   sun-rays.js        surface light rays
   seafloor.js        abyssal sand, rocks and the sand-height function
+  abyss-eels.js      glowing seafloor eels for the contact depth
   foreground-reef.js 2D foreground reef fade control
   species.js         fish species and depth-band configuration
   marine-life.js     GLB loading, fish motion, lanternfish glow

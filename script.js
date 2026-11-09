@@ -3,6 +3,7 @@ import { colorsAt } from "./src/palette.js";
 import { createBubbles } from "./src/bubbles.js";
 import { createSunRays } from "./src/sun-rays.js";
 import { createSeafloor } from "./src/seafloor.js";
+import { createAbyssEels } from "./src/abyss-eels.js";
 import { ABYSS_BAND, bandVisibility } from "./src/species.js";
 import { createMarineLife } from "./src/marine-life.js";
 import { initBackToTop } from "./src/back-to-top.js";
@@ -34,6 +35,8 @@ scene.add(sun);
 
 const seafloor = createSeafloor();
 scene.add(seafloor.group);
+
+const abyssEels = createAbyssEels({ scene });
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const marineLife = createMarineLife({ scene, camera, reduceMotion });
@@ -88,6 +91,7 @@ renderer.setAnimationLoop(() => {
 
   const abyss = bandVisibility(ABYSS_BAND, progress);
   seafloor.setOpacity(abyss);
+  abyssEels.update(progress, t, reduceMotion);
   marineLife.update(dt, t, progress);
   droneFleet.update(dt, t);
 
