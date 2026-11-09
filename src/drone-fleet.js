@@ -103,6 +103,8 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
       hotspotShown: false,
       hotspotWidth: 0,
       hotspotHeight: 0,
+      frameW: 0,
+      frameH: 0,
       initialized: false,
       baseSlot: null,
       focusSlot: null,
@@ -342,9 +344,17 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     project(scratch, projected);
     const labelTop = projected.y;
 
+    scratch.copy(labelWorld).addScaledVector(up, -0.6 * drone.root.scale.x);
+    project(scratch, projected);
+    const labelBottom = projected.y;
+
     scratch.copy(root.position).addScaledVector(up, -0.42 * drone.root.scale.x);
     project(scratch, projected);
     const droneBottom = projected.y;
+
+    scratch.copy(root.position).addScaledVector(up, 1.1 * drone.root.scale.x);
+    project(scratch, projected);
+    const droneTop = projected.y;
 
     const width = Math.max(96, Math.abs(rightX - leftX) * 1.06);
     const top = Math.min(labelTop, labelCenterY) - 12;
@@ -369,6 +379,20 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     }
     button.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`;
     button.style.opacity = String(clamp(drone.opacity * 1.4, 0, 1));
+
+    const frameW = Math.round(width * 0.74);
+    const frameTop = labelBottom + 2;
+    const frameH = Math.round(Math.max(frameW * 0.72, droneBottom + 2 - frameTop));
+    if (frameW !== drone.frameW) {
+      button.style.setProperty("--drone-frame-w", `${frameW}px`);
+      drone.frameW = frameW;
+    }
+    if (frameH !== drone.frameH) {
+      button.style.setProperty("--drone-frame-h", `${frameH}px`);
+      drone.frameH = frameH;
+    }
+    button.style.setProperty("--drone-frame-x", `${Math.round(centerX - left)}px`);
+    button.style.setProperty("--drone-frame-y", `${Math.round(frameTop - top)}px`);
   }
 
   function update(dt, elapsed) {
