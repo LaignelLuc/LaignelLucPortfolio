@@ -48,6 +48,8 @@ src/                 one module per feature
   project-window.js  project dialog, mock screens and open/close animation
   skills.js          skill families, their items and evidence lines
   skills-dial.js     sonar dial, hover card and mobile list
+  section-nav.js     dock navigation, active section and companion wiring
+  diver-companion.js procedural Three.js diver for the left rail
 image/               project screenshots and the avatar
   logos/             monochrome brand marks used by the skill card
 model/               GLB fish loaded by marine-life.js
@@ -55,6 +57,28 @@ model/               GLB fish loaded by marine-life.js
 
 There is no build step: the browser loads these files as they are, and Three.js
 comes from a CDN through the import map in `index.html`.
+
+## Navigation
+
+A macOS-style dock sits in the right gutter on wide screens. Each item is a real
+anchor (`#top`, `#projects`, `#skills`, `#contact`) marked with `data-nav`; the
+matching sections carry `data-nav-section`. The dock marks the section currently
+being read with a ring, a rail bar and `aria-current="location"`, and its icons
+magnify around the pointer. The four tiles reuse the pale monochrome glyph-on-dark
+treatment of the skill-card tool marks: a house for Accueil, a document for
+Projets, a sonar for Compétences and an envelope for Contact. Their labels rise
+in a bubble just above the icon on hover and keyboard focus. Without JavaScript
+the links still jump to their sections.
+
+The little scuba diver on the left rail is a separate procedural Three.js scene
+(`src/diver-companion.js`), not a GLB. It follows the page's scroll depth, kicks
+its fins faster while the page is moving and tilts up or down with the scroll
+direction. It renders a static pose under `prefers-reduced-motion: reduce`.
+
+Below 1024 px the dock moves to the bottom centre, the diver and the back-to-top
+button are hidden, and the dock's Accueil item returns to the top. The dock and
+diver are hidden while a project window is open. To add a section, add its id to
+the dock with `data-nav` and put `data-nav-section` on the section.
 
 ## Project drones
 

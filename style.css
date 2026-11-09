@@ -223,6 +223,7 @@ a:hover {
   padding-bottom: clamp(4rem, 12vh, 8rem);
 }
 
+
 .section-eyebrow {
   margin: 0 0 0.65rem;
   font-size: 0.7rem;
@@ -244,6 +245,7 @@ a:hover {
   font-size: 1rem;
   line-height: 1.45;
 }
+
 
 .drone-hotspots {
   position: fixed;
@@ -1642,6 +1644,10 @@ html.has-project-window .to-top {
 }
 
 @media (max-width: 63.99em) {
+  .zone--skills {
+    padding-bottom: 6.5rem;
+  }
+
   .dial__label,
   .dial__cardinals {
     display: none;
@@ -1656,6 +1662,7 @@ html.has-project-window .to-top {
 @media (min-width: 64em) {
   .zone--skills {
     display: grid;
+    padding-right: calc(max(var(--gutter), env(safe-area-inset-right)) + 5rem);
     grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
     align-items: center;
     gap: clamp(1.5rem, 3vw, 3rem);
@@ -1703,4 +1710,328 @@ html.has-project-window .to-top {
   gap: 1.6rem 2.5rem;
   align-content: start;
   max-width: 74rem;
+}
+
+/* ---------- Dock de navigation ---------- */
+.dock {
+  position: fixed;
+  top: 50%;
+  right: max(1.5rem, env(safe-area-inset-right));
+  z-index: 6;
+  transform: translateY(-50%);
+  transition: opacity 0.22s ease;
+}
+
+.dock__list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.55rem;
+  list-style: none;
+  border: 1px solid rgba(228, 250, 255, 0.26);
+  border-radius: 1.3rem;
+  background: linear-gradient(180deg, rgba(15, 48, 60, 0.58), rgba(3, 19, 27, 0.44));
+  box-shadow:
+    0 22px 55px -26px rgba(0, 8, 14, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.dock__item {
+  position: relative;
+  display: flex;
+}
+
+.dock__item::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -0.28rem;
+  width: 0.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  background: #dffaff;
+  box-shadow: 0 0 10px rgba(146, 238, 255, 0.92);
+  opacity: 0;
+  transform: translateY(-50%) scaleY(0.4);
+  transition:
+    opacity 0.22s ease,
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.dock__item.is-active::after {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
+
+.dock__link {
+  position: relative;
+  display: block;
+  width: 3.05rem;
+  height: 3.05rem;
+  border-radius: 0.52rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dock__link:focus-visible {
+  outline: none;
+}
+
+.dock__link:focus-visible .dock__icon {
+  outline: 2px solid #f4feff;
+  outline-offset: 3px;
+}
+
+.dock__icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(163, 233, 255, 0.18);
+  border-radius: 0.52rem;
+  background: rgba(150, 225, 255, 0.06);
+  color: #dff6ff;
+  transform: scale(var(--magnify, 1));
+  transform-origin: center;
+  transition:
+    transform 0.13s ease-out,
+    box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+.dock__icon svg {
+  position: relative;
+  z-index: 1;
+  width: 1.5rem;
+  height: 1.5rem;
+  opacity: 0.88;
+}
+
+.dock__item.is-active .dock__icon {
+  border-color: rgba(223, 246, 255, 0.9);
+  box-shadow:
+    0 0 0 1.5px rgba(223, 246, 255, 0.55),
+    0 0 22px -4px rgba(148, 236, 255, 0.65);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dock__link:hover .dock__icon {
+    --magnify: 1.16;
+  }
+}
+
+.dock__tip {
+  position: absolute;
+  top: auto;
+  left: auto;
+  right: calc(100% + 0.35rem);
+  bottom: calc(100% + 0.2rem);
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.38rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.5rem;
+  background: rgba(3, 20, 28, 0.84);
+  color: #dff6ff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(0.35rem, 0.35rem);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.8);
+}
+
+.dock__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: auto;
+  right: -0.15rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(3, 20, 28, 0.84);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.dock__tip-index {
+  color: #dff6ff;
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  opacity: 0.55;
+}
+
+.dock__link:hover .dock__tip,
+.dock__link:focus-visible .dock__tip {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* ---------- Le plongeur compagnon ---------- */
+.diver {
+  position: fixed;
+  top: 0;
+  left: max(0.5rem, env(safe-area-inset-left));
+  z-index: 5;
+  width: 7.5rem;
+  pointer-events: none;
+  transform: translate3d(0, 18vh, 0);
+  transition: opacity 0.22s ease;
+  will-change: transform;
+}
+
+.diver__stage {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  filter: drop-shadow(0 16px 22px rgba(2, 12, 24, 0.32));
+}
+
+.diver__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.diver__tag {
+  display: flex;
+  width: max-content;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: -2.2rem 0 0 0.3rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid rgba(230, 251, 255, 0.22);
+  border-radius: 0.45rem;
+  background: rgba(3, 21, 29, 0.52);
+  color: #eafcff;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+  box-shadow: 0 9px 22px -14px rgba(0, 0, 0, 0.8);
+}
+
+.diver__tag-index {
+  color: #93edff;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.diver.is-fallback {
+  display: none;
+}
+
+html.has-project-window .dock,
+html.has-project-window .diver {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock__icon,
+  .dock__item::after,
+  .dock__tip {
+    transition: none;
+  }
+
+  .diver {
+    transition: none;
+  }
+
+  .diver__stage {
+    filter: none;
+  }
+}
+
+/* ---------- Dock et plongeur : petit écran ---------- */
+@media (max-width: 63.99em) {
+  .dock {
+    top: auto;
+    right: auto;
+    bottom: max(0.8rem, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .dock__list {
+    flex-direction: row;
+    gap: 0.45rem;
+    padding: 0.45rem;
+    border-radius: 1.4rem;
+  }
+
+  .dock__link {
+    width: 2.85rem;
+    height: 2.85rem;
+  }
+
+  .dock__icon {
+    border-radius: 0.52rem;
+  }
+
+  .dock__icon svg {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+
+  .dock__item::after {
+    top: auto;
+    bottom: -0.42rem;
+    left: 50%;
+    width: 1rem;
+    height: 0.19rem;
+    transform: translateX(-50%) scaleX(0.4);
+  }
+
+  .dock__item.is-active::after {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  .dock__tip {
+    display: none;
+  }
+
+  .to-top {
+    display: none;
+  }
+
+  .zone--contact {
+    padding-bottom: 6.5rem;
+  }
+
+  .diver {
+    display: none;
+  }
+}
+
+@media (max-width: 47.99em) {
+  .skills-scope {
+    width: min(100%, 17rem);
+    margin: 1.25rem auto 0;
+  }
 }

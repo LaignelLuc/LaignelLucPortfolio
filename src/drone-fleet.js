@@ -180,8 +180,8 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     const fraction = mobile ? 0.46 : desktop ? 0.2 : 0.24;
     const slots = mobile
       ? [
-          { x: 0.26, y: 0.47, depth: 6.2, size: 0.94 },
-          { x: 0.74, y: 0.49, depth: 6.6, size: 0.94 },
+          { x: 0.26, y: 0.445, depth: 6.2, size: 0.94 },
+          { x: 0.74, y: 0.465, depth: 6.6, size: 0.94 },
           { x: 0.26, y: 0.79, depth: 6.0, size: 0.9 },
           { x: 0.74, y: 0.81, depth: 6.3, size: 0.9 },
         ]
@@ -195,8 +195,11 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
       : [
           { x: 0.26, y: 0.45, depth: 6.6, size: 0.95 },
           { x: 0.74, y: 0.47, depth: 6.9, size: 0.95 },
-          { x: 0.26, y: 0.82, depth: 6.3, size: 0.92 },
-          { x: 0.74, y: 0.84, depth: 6.6, size: 0.92 },
+          // 1024–1100 px is a landscape tablet: the dock is still on the side,
+          // so the bottom row keeps the lower slots instead of clearing a
+          // bottom dock that is not there.
+          { x: 0.26, y: vw >= 1024 ? 0.82 : 0.68, depth: 6.3, size: 0.92 },
+          { x: 0.74, y: vw >= 1024 ? 0.84 : 0.7, depth: 6.6, size: 0.92 },
         ];
     return { mobile, fraction, slots };
   }
@@ -304,8 +307,11 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     const bottom = Math.max(droneBottom, labelCenterY) + 12;
     const height = Math.max(110, bottom - top);
     let left = centerX - width / 2;
-    left = clamp(left, 8, vw - width - 8);
-    const topClamped = clamp(top, 8, Math.max(8, vh - 72));
+    const dockClearance = vw >= 1024 ? 100 : 8;
+    left = clamp(left, 8, vw - width - dockClearance);
+    // Keep the transparent hit area on the 3D label. The slot fractions keep
+    // the cards above the bottom dock, so clamping vertically here would only
+    // detach the button from the hologram it is meant to cover.
 
     const roundedW = Math.round(width);
     const roundedH = Math.round(height);
@@ -317,7 +323,7 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
       button.style.height = `${roundedH}px`;
       drone.hotspotHeight = roundedH;
     }
-    button.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(topClamped)}px, 0)`;
+    button.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`;
     button.style.opacity = String(clamp(drone.opacity * 1.4, 0, 1));
   }
 

@@ -20,6 +20,7 @@ import { PROJECTS } from "./src/projects.js";
 import { createDroneFleet } from "./src/drone-fleet.js";
 import { createProjectWindow } from "./src/project-window.js";
 import { createSkillsSection } from "./src/skills-dial.js";
+import { initSectionNav } from "./src/section-nav.js";
 // --- Scene
 const canvas = document.getElementById("ocean");
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -191,6 +192,7 @@ addEventListener("resize", resize);
 resize();
 onScroll();
 initBackToTop();
+const sectionNav = initSectionNav();
 
 // --- Loop
 const clock = new THREE.Clock();
@@ -217,6 +219,7 @@ renderer.setAnimationLoop(() => {
   marineSnow.update(dt, t, progress, reduceMotion);
   marineLife.update(dt, t, progress);
   droneFleet.update(dt, t);
+  sectionNav.update(dt, t);
 
   renderer.render(scene, camera);
 });
