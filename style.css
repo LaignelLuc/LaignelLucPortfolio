@@ -1167,6 +1167,17 @@ html.has-project-window .to-top {
 }
 
 /* --- cadran --- */
+/* The sweep used to rotate the pseudo-element itself. A rotated square's
+   bounding box grows by up to sqrt(2), which made the document wider than the
+   viewport on narrow phones; the browser then shrank the whole page to fit and
+   zoomed back in as the box turned. Animating the gradient angle instead keeps
+   the box (and the document width) fixed. */
+@property --dial-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .skills-scope {
   position: relative;
   width: min(100%, 20rem);
@@ -1190,7 +1201,7 @@ html.has-project-window .to-top {
   border-radius: 50%;
   pointer-events: none;
   background: conic-gradient(
-    from 0deg,
+    from var(--dial-angle, 0deg),
     transparent 0deg 300deg,
     rgba(158, 231, 255, 0.015) 306deg,
     rgba(158, 231, 255, 0.07) 348deg,
@@ -1204,7 +1215,7 @@ html.has-project-window .to-top {
 
 @keyframes dial-sweep {
   to {
-    transform: rotate(1turn);
+    --dial-angle: 360deg;
   }
 }
 
