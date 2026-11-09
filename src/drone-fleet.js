@@ -40,6 +40,7 @@ function createGlowTexture() {
 export function createDroneFleet({ scene, camera, projects, projectWindow }) {
   const section = document.querySelector("#projects");
   const container = document.querySelector("#drone-hotspots");
+  const lede = section?.querySelector(".section-lede");
   if (!section || !container) {
     console.warn("Drone fleet: #projects or #drone-hotspots is missing.");
     return { update() {}, destroy() {} };
@@ -145,6 +146,7 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
   let vh = window.innerHeight;
   let tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
   let destroyed = false;
+  let mobileAnchor = null;
 
   function updateViewport() {
     vw = window.innerWidth;
@@ -209,10 +211,47 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     return { mobile, fraction, slots };
   }
 
+  // The 3D labels are placed from the section geometry, but the intro text
+  // grows with the reader's font size. On mobile, keep the first row's panel
+  // below the lede instead of letting it slide up behind the paragraph, and
+  // give the section the extra height the shifted grid needs.
+  function updateMobileAnchor(rect, layout) {
+    if (!layout.mobile) {
+      mobileAnchor = null;
+      if (section.style.minHeight) section.style.minHeight = "";
+      return;
+    }
+
+    const slot = layout.slots[0];
+    const height = 2 * slot.depth * tangent;
+    const width = height * camera.aspect;
+    const scale = (layout.fraction * width * slot.size) / LABEL_WIDTH;
+    const halfLabel = (0.6 * scale) / (slot.depth * tangent) * vh * 0.5;
+    const ledeBottom = lede ? lede.getBoundingClientRect().bottom - rect.top : 0;
+
+    const first = Math.max(vh * 0.445, ledeBottom + 40 + halfLabel);
+    const secondBase = vh * 0.79;
+    const second = Math.max(secondBase, first + vh * 0.345);
+    mobileAnchor = { first, second };
+
+    const extra = second - secondBase;
+    const minHeight = extra > 0.5 ? `${Math.round(vh + extra)}px` : "";
+    if (section.style.minHeight !== minHeight) {
+      section.style.minHeight = minHeight;
+    }
+  }
+
   function layoutFor(drone, layout) {
     const slot = layout.slots[drone.index] ?? layout.slots[layout.slots.length - 1];
     const rect = section.getBoundingClientRect();
-    const labelScreenY = rect.top + rect.height * slot.y;
+    const height = 2 * slot.depth * tangent;
+    const width = height * camera.aspect;
+    const scale = (layout.fraction * width * slot.size) / LABEL_WIDTH;
+
+    let labelScreenY = rect.top + rect.height * slot.y;
+    if (layout.mobile && mobileAnchor) {
+      labelScreenY = rect.top + (drone.index < 2 ? mobileAnchor.first : mobileAnchor.second);
+    }
     const labelScreenX = vw * slot.x;
     const labelTarget = screenToWorld(
       labelScreenX / vw,
@@ -220,9 +259,6 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
       slot.depth,
       new THREE.Vector3()
     );
-    const height = 2 * slot.depth * tangent;
-    const width = height * camera.aspect;
-    const scale = (layout.fraction * width * slot.size) / LABEL_WIDTH;
     const rootTarget = labelTarget.clone().addScaledVector(up, -LABEL_Y * scale);
     return { slot, labelTarget, rootTarget, scale };
   }
@@ -347,6 +383,7 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     sectionVisible = smoothstep(fadeIn) * smoothstep(fadeOut);
 
     const layout = slotLayout();
+    updateMobileAnchor(rect, layout);
     const time = elapsed;
 
     for (const drone of drones) {
