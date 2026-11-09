@@ -1,6 +1,7 @@
 import { createDiverCompanion } from "./diver-companion.js";
 
 const DESKTOP_QUERY = "(min-width: 64em)";
+const COMPANION_QUERY = "(min-width: 80em) and (min-height: 46em)";
 const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -42,11 +43,14 @@ export function initSectionNav() {
     .filter((section) => section.id);
 
   const desktop = matchMedia(DESKTOP_QUERY);
+  const companionScreen = matchMedia(COMPANION_QUERY);
   const finePointer = matchMedia(FINE_POINTER_QUERY);
   const reduceMotion = matchMedia(REDUCED_MOTION_QUERY);
 
   let companion = null;
   let activeId = "";
+  let diverY = null;
+  let magnifySigma = 58;
   let velocity = 0;
   let previousScroll = window.scrollY;
   let maxScroll = 1;
@@ -54,19 +58,37 @@ export function initSectionNav() {
 
   function measure() {
     maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    magnifySigma = clamp(dock.getBoundingClientRect().height / 4.2, 58, 122);
     pointerInside = false;
     readActiveSection();
     if (desktop.matches) {
       companion?.resize();
-      placeDiver();
+    }
+    if (companionScreen.matches) {
+      diverY = null;
+      placeDiver(true);
     }
   }
 
-  function placeDiver() {
-    if (!desktop.matches) return;
-    const gap = 56;
-    const target = Math.max(10, dock.getBoundingClientRect().top - diver.offsetHeight - gap);
-    diver.style.transform = `translate3d(0, ${Math.round(target)}px, 0)`;
+  /**
+   * The diver sits just left of the long dock and is centred on the icon of
+   * the section currently being read. Moving the target to the active icon is
+   * what makes it swim down the rail as the reader changes section.
+   */
+  function placeDiver(instant = false, dt = 0) {
+    if (!companionScreen.matches) return;
+    const entry = links.find((item) => item.id === activeId) || links[0];
+    const rect = entry?.link.getBoundingClientRect();
+    if (!rect) return;
+
+    const target = rect.top + rect.height / 2 - stage.offsetHeight / 2;
+    if (instant || reduceMotion.matches || diverY === null) {
+      diverY = target;
+    } else {
+      diverY += (target - diverY) * (1 - Math.exp(-dt * 5.5));
+    }
+
+    diver.style.transform = `translate3d(0, ${diverY.toFixed(1)}px, 0)`;
   }
 
   function setActive(id) {
@@ -109,7 +131,7 @@ export function initSectionNav() {
       if (!rect) continue;
       const center = rect.top + rect.height / 2;
       const distance = Math.abs(clientY - center);
-      const falloff = Math.exp(-(distance * distance) / (2 * 58 * 58));
+      const falloff = Math.exp(-(distance * distance) / (2 * magnifySigma * magnifySigma));
       entry.icon.style.setProperty("--magnify", (1 + falloff * 0.34).toFixed(3));
     }
   }
@@ -168,15 +190,16 @@ export function initSectionNav() {
   }
 
   function setupDiver() {
-    if (desktop.matches && !companion) {
+    if (companionScreen.matches && !companion) {
       companion = createDiverCompanion(stage);
       if (!companion) {
         diver.classList.add("is-fallback");
       }
     }
-    if (desktop.matches) {
+    if (companionScreen.matches) {
       companion?.resize();
-      placeDiver();
+      diverY = null;
+      placeDiver(true);
     }
   }
 
@@ -192,10 +215,14 @@ export function initSectionNav() {
   document.fonts?.ready.then(measure);
 
   desktop.addEventListener("change", () => {
-    if (desktop.matches) {
+    if (!desktop.matches) resetMagnification();
+  });
+
+  companionScreen.addEventListener("change", () => {
+    if (companionScreen.matches) {
       setupDiver();
     } else {
-      resetMagnification();
+      diverY = null;
     }
   });
 
@@ -219,8 +246,12 @@ export function initSectionNav() {
     companion?.setSwimming(0.12 + drive * 0.5);
     companion?.setTilt(clamp(-velocity / 3600, -0.2, 0.2));
     companion?.setDepth(progress);
+    placeDiver(false, dt);
 
-    if (!document.documentElement.classList.contains("has-project-window")) {
+    if (
+      companionScreen.matches &&
+      !document.documentElement.classList.contains("has-project-window")
+    ) {
       companion?.update(dt, time);
     }
   }
