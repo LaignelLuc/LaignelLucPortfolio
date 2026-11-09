@@ -47,40 +47,26 @@ export function initSectionNav() {
 
   let companion = null;
   let activeId = "";
-  let diverY = 0;
   let velocity = 0;
   let previousScroll = window.scrollY;
-  let railTop = 24;
-  let railTravel = 0;
   let maxScroll = 1;
   let pointerInside = false;
 
   function measure() {
     maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    railTop = Math.max(20, Math.round(window.innerHeight * 0.028));
-    railTravel = Math.max(0, window.innerHeight - diver.offsetHeight - railTop * 2);
     pointerInside = false;
     readActiveSection();
     if (desktop.matches) {
       companion?.resize();
-      placeDiver(0, true);
+      placeDiver();
     }
   }
 
-  function diverTarget() {
-    const progress = clamp(window.scrollY / maxScroll, 0, 1);
-    return railTop + progress * railTravel;
-  }
-
-  function placeDiver(dt, instant = false) {
+  function placeDiver() {
     if (!desktop.matches) return;
-    const target = diverTarget();
-    if (instant || reduceMotion.matches) {
-      diverY = target;
-    } else {
-      diverY += (target - diverY) * (1 - Math.exp(-dt * 11));
-    }
-    diver.style.transform = `translate3d(0, ${diverY.toFixed(2)}px, 0)`;
+    const gap = 56;
+    const target = Math.max(10, dock.getBoundingClientRect().top - diver.offsetHeight - gap);
+    diver.style.transform = `translate3d(0, ${Math.round(target)}px, 0)`;
   }
 
   function setActive(id) {
@@ -190,7 +176,7 @@ export function initSectionNav() {
     }
     if (desktop.matches) {
       companion?.resize();
-      placeDiver(0, true);
+      placeDiver();
     }
   }
 
@@ -225,13 +211,14 @@ export function initSectionNav() {
 
     // Scroll speed feeds the fins and the body pitch: descending noses down,
     // rising noses up. It decays back to a calm hover when the page is still.
-    const instant = delta / Math.max(dt, 0.001);
-    velocity += (instant - velocity) * Math.min(1, dt * 7);
-    const drive = clamp(Math.abs(velocity) / 1900, 0, 1);
+    const instant = clamp(delta / Math.max(dt, 0.001), -2200, 2200);
+    velocity += (instant - velocity) * Math.min(1, dt * 4.5);
+    const drive = clamp(Math.abs(velocity) / 2400, 0, 1);
+    const progress = clamp(window.scrollY / maxScroll, 0, 1);
 
-    companion?.setSwimming(0.18 + drive * 0.82);
-    companion?.setTilt(clamp(-velocity / 2600, -0.26, 0.26));
-    placeDiver(dt, reduceMotion.matches);
+    companion?.setSwimming(0.12 + drive * 0.5);
+    companion?.setTilt(clamp(-velocity / 3600, -0.2, 0.2));
+    companion?.setDepth(progress);
 
     if (!document.documentElement.classList.contains("has-project-window")) {
       companion?.update(dt, time);

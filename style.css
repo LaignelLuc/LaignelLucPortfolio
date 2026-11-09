@@ -1886,11 +1886,11 @@ html.has-project-window .to-top {
 .diver {
   position: fixed;
   top: 0;
-  left: max(0.5rem, env(safe-area-inset-left));
+  right: max(1.5rem, env(safe-area-inset-right));
   z-index: 5;
   width: 7.5rem;
   pointer-events: none;
-  transform: translate3d(0, 18vh, 0);
+  transform: translate3d(0, 5rem, 0);
   transition: opacity 0.22s ease;
   will-change: transform;
 }
@@ -1965,6 +1965,14 @@ html.has-project-window .diver {
 
   .diver__stage {
     filter: none;
+  }
+}
+
+/* Sur un écran large mais très bas, le plongeur n'a pas la place de
+   rester au-dessus du dock sans le recouvrir. */
+@media (max-height: 36rem) {
+  .diver {
+    display: none;
   }
 }
 

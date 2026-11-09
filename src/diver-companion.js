@@ -167,6 +167,15 @@ export function createDiverCompanion(stage) {
     side: THREE.DoubleSide,
   });
 
+  // The diver lives in its own canvas, so it does not receive the ocean's
+  // depth tint. Keep the original palette and shade it by scroll depth the
+  // same way the fish materials are dimmed when they enter a deeper band.
+  const shadedMaterials = [suit, suitDeep, accent, metal, metalDark, glove].map(
+    (material) => ({ material, base: material.color.clone() })
+  );
+  const accentGlow = accent.emissiveIntensity;
+  const glassGlow = glass.emissiveIntensity;
+
   const diver = new THREE.Group();
   diver.rotation.y = -0.3;
   diver.rotation.z = 0.24;
@@ -410,6 +419,9 @@ export function createDiverCompanion(stage) {
   let targetSwim = 0;
   let tilt = 0;
   let targetTilt = 0;
+  let depth = 0;
+  let targetDepth = 0;
+  let kickPhase = 0;
   let needsRender = true;
 
   function resize() {
@@ -430,12 +442,34 @@ export function createDiverCompanion(stage) {
     targetTilt = clamp(value, -0.28, 0.28);
   }
 
+  function applyDepth(value) {
+    const deep = THREE.MathUtils.smoothstep(value, 0.05, 0.95);
+    const brightness = 1.04 - 0.42 * deep;
+    for (const { material, base } of shadedMaterials) {
+      material.color.copy(base).multiplyScalar(brightness);
+    }
+    accent.emissiveIntensity = accentGlow * (1 - 0.35 * deep);
+    glass.emissiveIntensity = glassGlow * (1 - 0.3 * deep);
+    needsRender = true;
+  }
+
+  function setDepth(value) {
+    const next = clamp(value, 0, 1);
+    if (Math.abs(next - targetDepth) < 0.0005) return;
+    targetDepth = next;
+    if (reduceMotion.matches) {
+      depth = next;
+      applyDepth(depth);
+    }
+  }
+
   function update(dt, time) {
     const step = Math.min(dt, 0.05);
 
     if (reduceMotion.matches) {
       swim = 0;
       tilt = 0;
+      kickPhase = 0;
       rig.position.y = 0;
       rig.rotation.z = 0.055;
       nearFin.rotation.z = -0.04;
@@ -446,23 +480,26 @@ export function createDiverCompanion(stage) {
       return;
     }
 
-    swim += (targetSwim - swim) * Math.min(1, step * 6);
-    tilt += (targetTilt - tilt) * Math.min(1, step * 5);
+    swim += (targetSwim - swim) * Math.min(1, step * 4);
+    tilt += (targetTilt - tilt) * Math.min(1, step * 4);
+    depth += (targetDepth - depth) * Math.min(1, step * 2.5);
+    applyDepth(depth);
     const idle = 1 - swim;
 
     rig.position.y = Math.sin(time * 1.45) * (0.032 + swim * 0.02);
     rig.rotation.z = 0.055 + tilt + Math.sin(time * 1.05) * 0.018 * idle;
     rig.rotation.x = Math.sin(time * 0.85) * 0.02 * idle;
 
-    const kickSpeed = 2.8 + swim * 7.2;
-    const kickAmp = 0.12 + swim * 0.26;
-    nearFin.rotation.z = -0.04 + Math.sin(time * kickSpeed) * kickAmp;
-    farFin.rotation.z = -0.04 + Math.sin(time * kickSpeed + Math.PI) * kickAmp;
+    const kickSpeed = 2.2 + swim * 4.4;
+    const kickAmp = 0.1 + swim * 0.16;
+    kickPhase += step * kickSpeed;
+    nearFin.rotation.z = -0.04 + Math.sin(kickPhase) * kickAmp;
+    farFin.rotation.z = -0.04 + Math.sin(kickPhase + Math.PI) * kickAmp;
     nearFin.rotation.x = 0.22 + Math.sin(time * 1.2) * 0.02;
     farFin.rotation.x = -0.26 - Math.sin(time * 1.2 + 1) * 0.02;
 
     for (const bubble of bubbles) {
-      const travel = (time * (0.055 + swim * 0.1) + bubble.phase) % 1;
+      const travel = (time * (0.04 + swim * 0.06) + bubble.phase) % 1;
       const rise = travel * 2.05;
       bubble.sprite.position.set(
         1.1 + travel * 0.16 + Math.sin(time * bubble.sway + bubble.phase * 9) * bubble.drift,
@@ -483,5 +520,5 @@ export function createDiverCompanion(stage) {
   }
 
   resize();
-  return { resize, setSwimming, setTilt, update, destroy };
+  return { resize, setSwimming, setTilt, setDepth, update, destroy };
 }
