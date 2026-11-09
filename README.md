@@ -36,6 +36,10 @@ src/                 one module per feature
   foreground-reef.js 2D foreground reef fade control
   species.js         fish species and depth-band configuration
   marine-life.js     GLB loading, fish motion, lanternfish glow
+  fish-school.js     instanced low-poly sardine and mackerel schools
+  barracuda.js       single barracuda at the sunlit edge
+  jellyfish.js       twilight moon jellies and the abyssal jelly
+  marine-snow.js     abyssal drifting particle layer
   back-to-top.js     DSMB back-to-top button behavior
   projects.js        project copy, accents, screens and drone variants
   drone-model.js     procedural underwater drone model
@@ -78,6 +82,24 @@ needs a new slot in `src/drone-fleet.js`.
 
 The drones respect `prefers-reduced-motion`: no idle drift, no rotor spin, and
 shorter window transitions.
+
+## Marine life
+
+Each depth band has a small set of species. The sardines and mackerel are
+schools, but they are not clones of a skinned GLB: each school is one
+`InstancedMesh` with a procedural low-poly fish, one shared material and a
+small vertex-shader tail beat. That keeps each school to one draw call and
+lets the counts drop from 48 to 28 sardines and from 16 to 12 mackerel on
+narrow screens. The barracuda, moon jellies, abyssal jelly and marine snow
+are single lightweight meshes or point layers. All of them fade with the same
+scroll bands as the GLB fish.
+
+- Sunlit (0–50 m): the sardine bait ball and one barracuda at its edge, with
+  the existing surface fish.
+- Twilight (50–200 m): the mackerel school and three moon jellies, with the
+  existing mid-water animals.
+- Abyss (500 m+): the lanternfish, the stylized seafloor eels, one abyssal
+  jelly and drifting marine snow.
 
 ## Compétences
 
