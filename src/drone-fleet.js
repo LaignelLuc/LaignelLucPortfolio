@@ -90,8 +90,8 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
       index,
       button,
       phase: index * 2.4,
-      baseYaw: baseYaw[index] ?? 0,
-      basePitch: basePitch[index] ?? 0,
+      baseYaw: baseYaw[index % baseYaw.length],
+      basePitch: basePitch[index % basePitch.length],
       hovered: false,
       hover: 0,
       focusT: 0,
@@ -148,12 +148,21 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
   let vh = window.innerHeight;
   let tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
   let destroyed = false;
-  let mobileAnchor = null;
+  let rowAnchors = null;
+  let naturalHeight = 0;
 
   function updateViewport() {
+    const widthChanged = window.innerWidth !== vw;
     vw = window.innerWidth;
     vh = window.innerHeight;
     tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
+    // A new width changes the tier's CSS min-height, so the designed height has
+    // to be measured again. Height-only changes (a phone's URL bar) must not
+    // collapse the section under the reader.
+    if (widthChanged) {
+      if (section.style.minHeight) section.style.minHeight = "";
+      naturalHeight = 0;
+    }
   }
 
   updateViewport();
@@ -183,64 +192,127 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     return out;
   }
 
+  // The fleet is sized from the project list. The four-project arrangement is
+  // the reference composition; any extra project continues the same rhythm
+  // (more rows on the 2-column tiers, a tighter desktop row) instead of
+  // stacking on the last slot.
   function slotLayout() {
+    const count = Math.max(projects.length, 1);
     const mobile = vw < 768;
     const desktop = vw > 1100;
-    const fraction = mobile ? 0.46 : desktop ? 0.2 : 0.24;
-    const slots = mobile
-      ? [
-          { x: 0.26, y: 0.445, depth: 6.2, size: 0.94 },
-          { x: 0.74, y: 0.465, depth: 6.6, size: 0.94 },
-          { x: 0.26, y: 0.79, depth: 6.0, size: 0.9 },
-          { x: 0.74, y: 0.81, depth: 6.3, size: 0.9 },
-        ]
-      : desktop
-      ? [
-          { x: 0.14, y: 0.56, depth: 6.3, size: 1 },
-          { x: 0.38, y: 0.54, depth: 7.1, size: 1.04 },
-          { x: 0.62, y: 0.56, depth: 6.5, size: 1 },
-          { x: 0.86, y: 0.545, depth: 6.8, size: 1.02 },
-        ]
-      : [
-          { x: 0.26, y: 0.45, depth: 6.6, size: 0.95 },
-          { x: 0.74, y: 0.47, depth: 6.9, size: 0.95 },
-          // 1024–1100 px is a landscape tablet: the dock is still on the side,
-          // so the bottom row keeps the lower slots instead of clearing a
-          // bottom dock that is not there.
-          { x: 0.26, y: vw >= 1024 ? 0.82 : 0.68, depth: 6.3, size: 0.92 },
-          { x: 0.74, y: vw >= 1024 ? 0.84 : 0.7, depth: 6.6, size: 0.92 },
-        ];
-    return { mobile, fraction, slots };
+
+    if (desktop) {
+      const fraction = count <= 4 ? 0.2 : 0.78 / count;
+      if (count === 4) {
+        return {
+          mobile,
+          desktop,
+          columns: count,
+          fraction,
+          slots: [
+            { x: 0.14, y: 0.56, depth: 6.3, size: 1 },
+            { x: 0.38, y: 0.54, depth: 7.1, size: 1.04 },
+            { x: 0.62, y: 0.56, depth: 6.5, size: 1 },
+            { x: 0.86, y: 0.545, depth: 6.8, size: 1.02 },
+          ],
+        };
+      }
+
+      const depths = [6.3, 7.1, 6.5, 6.8];
+      const sizes = [1, 1.04, 1, 1.02];
+      const step = count > 1 ? 0.72 / (count - 1) : 0;
+      const slots = Array.from({ length: count }, (_, index) => ({
+        x: count > 1 ? 0.14 + index * step : 0.5,
+        y: index % 2 ? 0.545 : 0.56,
+        depth: depths[index % depths.length],
+        size: sizes[index % sizes.length],
+      }));
+      return { mobile, desktop, columns: count, fraction, slots };
+    }
+
+    const columns = 2;
+    const depths = mobile ? [6.2, 6.6, 6.0, 6.3] : [6.6, 6.9, 6.3, 6.6];
+    const sizes = mobile ? [0.94, 0.94, 0.9, 0.9] : [0.95, 0.95, 0.92, 0.92];
+    const baseY = mobile ? 0.445 : 0.45;
+    // 1024–1100 px is a landscape tablet: the dock is still on the side, so
+    // the rows are spaced wider than on the portrait tablet.
+    const rowGap = mobile ? 0.345 : vw >= 1024 ? 0.37 : 0.23;
+    const slots = Array.from({ length: count }, (_, index) => {
+      const column = index % columns;
+      const row = Math.floor(index / columns);
+      return {
+        x: column === 0 ? 0.26 : 0.74,
+        y: baseY + row * rowGap + (column === 1 ? 0.02 : 0),
+        depth: depths[index % depths.length],
+        size: sizes[index % sizes.length],
+      };
+    });
+    return { mobile, desktop, columns, fraction: mobile ? 0.46 : 0.24, baseY, rowGap, slots };
   }
 
-  // The 3D labels are placed from the section geometry, but the intro text
-  // grows with the reader's font size. On mobile, keep the first row's panel
-  // below the lede instead of letting it slide up behind the paragraph, and
-  // give the section the extra height the shifted grid needs.
-  function updateMobileAnchor(rect, layout) {
-    if (!layout.mobile) {
-      mobileAnchor = null;
+  // Screen-space metrics of a hologram label: `scale` is the label's world
+  // scale, `pxPerUnit` converts local units to CSS pixels at that depth.
+  function labelMetrics(slot, fraction) {
+    const height = 2 * slot.depth * tangent;
+    const width = height * camera.aspect;
+    return {
+      scale: (fraction * width * slot.size) / LABEL_WIDTH,
+      pxPerUnit: vh / height,
+    };
+  }
+
+  // Row anchors are pixel offsets from the section top. On mobile the first
+  // row also clears the lede, which grows with the reader's font size; on both
+  // tiers extra rows extend the section instead of running over the next one.
+  function updateAnchors(rect, layout) {
+    if (layout.desktop) {
+      rowAnchors = null;
       if (section.style.minHeight) section.style.minHeight = "";
       return;
     }
 
-    const slot = layout.slots[0];
-    const height = 2 * slot.depth * tangent;
-    const width = height * camera.aspect;
-    const scale = (layout.fraction * width * slot.size) / LABEL_WIDTH;
-    const halfLabel = (0.6 * scale) / (slot.depth * tangent) * vh * 0.5;
-    const ledeBottom = lede ? lede.getBoundingClientRect().bottom - rect.top : 0;
+    // The section's designed height, measured before any inline growth, so the
+    // added rows never drag the existing ones down as the section expands.
+    if (!section.style.minHeight) naturalHeight = rect.height;
+    const baseHeight = layout.mobile ? vh : naturalHeight || rect.height;
 
-    const first = Math.max(vh * 0.445, ledeBottom + 40 + halfLabel);
-    const secondBase = vh * 0.79;
-    const second = Math.max(secondBase, first + vh * 0.345);
-    mobileAnchor = { first, second };
-
-    const extra = second - secondBase;
-    const minHeight = extra > 0.5 ? `${Math.round(vh + extra)}px` : "";
-    if (section.style.minHeight !== minHeight) {
-      section.style.minHeight = minHeight;
+    const rowCount = Math.ceil(layout.slots.length / layout.columns);
+    const step = baseHeight * layout.rowGap;
+    let halfLabel = 0;
+    if (layout.mobile) {
+      const { scale, pxPerUnit } = labelMetrics(layout.slots[0], layout.fraction);
+      halfLabel = 0.6 * scale * pxPerUnit;
     }
+    const ledeBottom =
+      layout.mobile && lede ? lede.getBoundingClientRect().bottom - rect.top : 0;
+
+    const anchors = [];
+    for (let row = 0; row < rowCount; row += 1) {
+      const base = baseHeight * (layout.baseY + row * layout.rowGap);
+      let next = base;
+      if (row === 0 && layout.mobile) {
+        next = Math.max(base, ledeBottom + 40 + halfLabel);
+      } else if (row > 0) {
+        next = Math.max(base, anchors[row - 1] + step);
+      }
+      anchors.push(next);
+    }
+    rowAnchors = anchors;
+
+    // Mobile keeps the designed 0.21 vh bottom allowance; the tablet only grows
+    // once a third row needs room, using the measured label+drone extent.
+    let minHeight = "";
+    if (layout.mobile) {
+      const value = anchors[rowCount - 1] + vh * 0.21;
+      minHeight = value > vh + 0.5 ? `${Math.round(value)}px` : "";
+    } else if (rowCount > 2) {
+      const last = layout.slots[layout.slots.length - 1];
+      const { scale, pxPerUnit } = labelMetrics(last, layout.fraction);
+      const value = anchors[rowCount - 1] + 2.6 * scale * pxPerUnit + 24;
+      minHeight = value > baseHeight + 0.5 ? `${Math.round(value)}px` : "";
+    }
+
+    if (section.style.minHeight !== minHeight) section.style.minHeight = minHeight;
   }
 
   function layoutFor(drone, layout) {
@@ -251,8 +323,12 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     const scale = (layout.fraction * width * slot.size) / LABEL_WIDTH;
 
     let labelScreenY = rect.top + rect.height * slot.y;
-    if (layout.mobile && mobileAnchor) {
-      labelScreenY = rect.top + (drone.index < 2 ? mobileAnchor.first : mobileAnchor.second);
+    if (rowAnchors) {
+      const row = Math.min(
+        Math.floor(drone.index / layout.columns),
+        rowAnchors.length - 1
+      );
+      labelScreenY = rect.top + rowAnchors[row];
     }
     const labelScreenX = vw * slot.x;
     const labelTarget = screenToWorld(
@@ -407,7 +483,7 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     sectionVisible = smoothstep(fadeIn) * smoothstep(fadeOut);
 
     const layout = slotLayout();
-    updateMobileAnchor(rect, layout);
+    updateAnchors(rect, layout);
     const time = elapsed;
 
     for (const drone of drones) {
