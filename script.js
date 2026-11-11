@@ -49,51 +49,82 @@ const abyssEels = createAbyssEels({ scene });
 
 const SUNLIT_BAND = DEPTH_BANDS.find((band) => band.id === "sunlit");
 const TWILIGHT_BAND = DEPTH_BANDS.find((band) => band.id === "twilight");
-const compact = matchMedia("(max-width: 700px)").matches;
+// Fish density follows the same 768 px tier as the CSS (47.99em) and the
+// drone fleet, and is rebuilt when a rotation or a window resize crosses it.
+// keep in sync with style.css (47.99em) and src/drone-fleet.js (< 768)
+const COMPACT_QUERY = "(max-width: 767.98px)";
+const compactMedia = matchMedia(COMPACT_QUERY);
+let compact = compactMedia.matches;
 
-const sardineSchool = createFishSchool({
-  scene,
-  camera,
-  name: "SardineBaitBall",
-  band: SUNLIT_BAND,
-  count: compact ? 28 : 48,
-  length: 0.46,
-  centerY: 1.15,
-  z: -7.6,
-  xFactor: 0.4,
-  radius: 1.45,
-  vertical: 0.9,
-  speed: 0.85,
-  phase: 0.6,
-  colors: { top: "#315764", belly: "#e8efe4", fin: "#b7c9c5" },
-  swaySpeed: 4.4,
-  swayAmount: 0.055,
-});
+function buildFishSchools(isCompact) {
+  const sardines = createFishSchool({
+    scene,
+    camera,
+    name: "SardineBaitBall",
+    band: SUNLIT_BAND,
+    count: isCompact ? 28 : 48,
+    length: 0.46,
+    centerY: 1.15,
+    z: -7.6,
+    xFactor: 0.4,
+    radius: 1.45,
+    vertical: 0.9,
+    speed: 0.85,
+    phase: 0.6,
+    colors: { top: "#315764", belly: "#e8efe4", fin: "#b7c9c5" },
+    swaySpeed: 4.4,
+    swayAmount: 0.055,
+  });
+
+  const mackerels = createFishSchool({
+    scene,
+    camera,
+    name: "MackerelSchool",
+    band: TWILIGHT_BAND,
+    count: isCompact ? 12 : 16,
+    length: 0.62,
+    centerY: 0.2,
+    z: -12.5,
+    xFactor: -0.6,
+    radius: 1,
+    vertical: 0.65,
+    speed: 0.7,
+    phase: 2.4,
+    colors: { top: "#204855", belly: "#d8e5dc", fin: "#8fadaa" },
+    stripes: true,
+    swaySpeed: 4.8,
+    swayAmount: 0.05,
+  });
+
+  return { sardines, mackerels };
+}
+
+function disposeFishSchool(school) {
+  scene.remove(school.mesh);
+  school.mesh.geometry?.dispose();
+  school.material?.dispose();
+}
+
+let { sardines: sardineSchool, mackerels: mackerelSchool } = buildFishSchools(compact);
+
+function onCompactChange(event) {
+  if (event.matches === compact) return;
+  compact = event.matches;
+  disposeFishSchool(sardineSchool);
+  disposeFishSchool(mackerelSchool);
+  ({ sardines: sardineSchool, mackerels: mackerelSchool } = buildFishSchools(compact));
+}
+
+if (compactMedia.addEventListener) {
+  compactMedia.addEventListener("change", onCompactChange);
+} else if (compactMedia.addListener) {
+  compactMedia.addListener(onCompactChange);
+}
 
 const barracuda = createBarracuda({
   scene,
   camera,
   band: SUNLIT_BAND,
-});
-
-const mackerelSchool = createFishSchool({
-  scene,
-  camera,
-  name: "MackerelSchool",
-  band: TWILIGHT_BAND,
-  count: compact ? 12 : 16,
-  length: 0.62,
-  centerY: 0.2,
-  z: -12.5,
-  xFactor: -0.6,
-  radius: 1,
-  vertical: 0.65,
-  speed: 0.7,
-  phase: 2.4,
-  colors: { top: "#204855", belly: "#d8e5dc", fin: "#8fadaa" },
-  stripes: true,
-  swaySpeed: 4.8,
-  swayAmount: 0.05,
 });
 
 const jellies = createJellyfish({

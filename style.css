@@ -9,11 +9,10 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  /* The site is an immersive, viewport-sized scene: an accidental pinch or
-     double tap (easy on the large invisible drone hit areas) rescales the
-     whole page and is very hard to undo. Keep vertical panning and all
-     buttons/links working, but never let the page zoom on a touch gesture. */
-  touch-action: pan-y;
+  /* Pinch and double-tap zoom stay available to the reader. The fixed chrome
+     is capped in pixels (see .dock and .to-top) so a zoomed page can never
+     push the navigation off screen. Only .drone-hotspot opts out, because its
+     invisible hit area is the size of the drone. */
 }
 
 body {
@@ -88,6 +87,10 @@ body {
   }
 }
 
+.zone > * {
+  min-width: 0;
+}
+
 .zone {
   position: relative;
   z-index: 1;
@@ -114,8 +117,8 @@ body {
   background: rgba(239, 253, 255, 0.15);
 }
 
-h1 { font-size: clamp(2.5rem, 13vw, 4.5rem); font-weight: 700; line-height: 1; }
-h2 { font-size: clamp(1.75rem, 8vw, 3rem); font-weight: 700; line-height: 1.1; }
+h1 { font-size: min(clamp(2.5rem, 13vw, 4.5rem), 15vw); font-weight: 700; line-height: 1; }
+h2 { font-size: min(clamp(1.75rem, 8vw, 3rem), 11.5vw); font-weight: 700; line-height: 1.1; }
 
 p {
   margin-top: 1rem;
@@ -124,8 +127,14 @@ p {
   max-width: 40ch;
 }
 
-h1, h2, p {
+h1, h2, p, a {
   text-shadow: 0 1px 2px rgba(0, 8, 14, 0.2);
+}
+
+/* Only breaks a word that cannot fit its column (extreme text zoom, e-mail
+   address); headings keep their own line-breaking so display type stays whole. */
+h1, p, a {
+  overflow-wrap: break-word;
 }
 
 /* Cibles tactiles confortables pour les futurs liens/boutons */
@@ -147,7 +156,7 @@ a:hover {
   right: max(1.25rem, env(safe-area-inset-right));
   bottom: max(1.25rem, env(safe-area-inset-bottom));
   z-index: 4;
-  width: clamp(3rem, 5vw, 4rem);
+  width: min(clamp(3rem, 5vw, 4rem), 64px);
   padding: 0;
   border: 0;
   background: none;
@@ -209,8 +218,8 @@ a:hover {
 @media (min-width: 48em) {
   :root { --gutter: 3rem; }
 
-  h1 { font-size: clamp(4rem, 9vw, 6rem); }
-  h2 { font-size: clamp(2.5rem, 5vw, 3.5rem); }
+  h1 { font-size: min(clamp(4rem, 9vw, 6rem), 13vw); }
+  h2 { font-size: min(clamp(2.5rem, 5vw, 3.5rem), 9vw); }
   p  { font-size: 1.2rem; }
 }
 
@@ -219,8 +228,8 @@ a:hover {
   :root { --gutter: 8rem; }
 
   .zone { max-width: 60rem; }
-  h1 { font-size: 7rem; }
-  h2 { font-size: 4rem; }
+  h1 { font-size: min(7rem, 12vw); }
+  h2 { font-size: min(4rem, 7.5vw); }
 }
 
 /* ---------- Projets : flotte de drones ---------- */
@@ -233,7 +242,8 @@ a:hover {
 
 .section-eyebrow {
   margin: 0 0 0.65rem;
-  font-size: 0.7rem;
+  /* Capped by the viewport so the tracked capitals never break mid-word. */
+  font-size: min(0.75rem, 4vw);
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -259,6 +269,10 @@ a:hover {
   inset: 0;
   z-index: 2;
   pointer-events: none;
+  /* Hotspots are clamped in JS too, but clipping the layer keeps a zoomed or
+     very narrow viewport from gaining horizontal scroll through it. */
+  overflow: hidden;
+  overflow: clip;
 }
 
 .drone-hotspot {
@@ -469,7 +483,7 @@ html.has-project-window .to-top {
   gap: 0.55rem;
   margin: 0;
   color: var(--accent);
-  font-size: 0.64rem;
+  font-size: 0.73rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -571,7 +585,7 @@ html.has-project-window .to-top {
   gap: 0.45rem;
   margin: 0 0 0.55rem;
   color: var(--accent);
-  font-size: 0.62rem;
+  font-size: 0.71rem;
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -627,7 +641,7 @@ html.has-project-window .to-top {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.03);
   color: rgba(234, 252, 255, 0.74);
-  font-size: 0.58rem;
+  font-size: 0.7rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -640,14 +654,14 @@ html.has-project-window .to-top {
   padding-top: 1.1rem;
   max-width: none;
   color: rgba(234, 252, 255, 0.4);
-  font-size: 0.64rem;
+  font-size: 0.73rem;
   line-height: 1.45;
   text-shadow: none;
 }
 
 .project-window__note span {
   color: var(--accent);
-  font-size: 0.55rem;
+  font-size: 0.7rem;
 }
 
 .project-window__footer {
@@ -659,7 +673,7 @@ html.has-project-window .to-top {
   margin-top: 0.9rem;
   border-top: 1px solid rgba(255, 255, 255, 0.09);
   color: rgba(234, 252, 255, 0.34);
-  font-size: 0.56rem;
+  font-size: 0.7rem;
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
@@ -1163,7 +1177,7 @@ html.has-project-window .to-top {
 
 /* ---------- Compétences : le sonar ---------- */
 .zone--skills h2 {
-  font-size: clamp(2.6rem, 7.4vw, 3.2rem);
+  font-size: min(clamp(2.6rem, 7.4vw, 3.2rem), 11.5vw);
 }
 
 .zone--skills {
@@ -1179,9 +1193,9 @@ html.has-project-window .to-top {
 .skills-meta {
   margin-top: 1.1rem;
   max-width: none;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   opacity: 0.6;
 }
@@ -1372,7 +1386,7 @@ html.has-project-window .to-top {
 }
 
 .dial__label {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.2em;
   fill: currentColor;
@@ -1619,11 +1633,11 @@ html.has-project-window .to-top {
 .skill-family__label {
   margin: 0;
   max-width: none;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.62;
 }
 
 .skill-family.is-active .skill-family__label {
@@ -1659,9 +1673,9 @@ html.has-project-window .to-top {
 .skill-family__evidence {
   margin: 0.5rem 0 0;
   max-width: none;
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   font-weight: 300;
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 .skill-family__evidence span {
@@ -1709,7 +1723,7 @@ html.has-project-window .to-top {
   }
 
   .zone--skills h2 {
-    font-size: clamp(2.6rem, 4.3vw, 4rem);
+    font-size: min(clamp(2.6rem, 4.3vw, 4rem), 6.4vw);
   }
 
   .skills-scope {
@@ -1764,9 +1778,9 @@ html.has-project-window .to-top {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
+  gap: min(0.55rem, 8px);
   margin: 0;
-  padding: 0.55rem;
+  padding: min(0.55rem, 8px);
   list-style: none;
   border: 1px solid rgba(228, 250, 255, 0.26);
   border-radius: 1.3rem;
@@ -1809,8 +1823,8 @@ html.has-project-window .to-top {
 .dock__link {
   position: relative;
   display: block;
-  width: 3.05rem;
-  height: 3.05rem;
+  width: min(3.05rem, 56px);
+  height: min(3.05rem, 56px);
   border-radius: 0.52rem;
   -webkit-tap-highlight-color: transparent;
 }
@@ -1844,8 +1858,8 @@ html.has-project-window .to-top {
 .dock__icon svg {
   position: relative;
   z-index: 1;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: min(1.5rem, 26px);
+  height: min(1.5rem, 26px);
   opacity: 0.88;
 }
 
@@ -1876,9 +1890,9 @@ html.has-project-window .to-top {
   border-radius: 0.5rem;
   background: rgba(3, 20, 28, 0.84);
   color: #dff6ff;
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1909,8 +1923,8 @@ html.has-project-window .to-top {
 
 .dock__tip-index {
   color: #dff6ff;
-  font-size: 0.46rem;
-  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
   opacity: 0.55;
 }
 
@@ -1956,7 +1970,7 @@ html.has-project-window .to-top {
   border-radius: 0.45rem;
   background: rgba(3, 21, 29, 0.52);
   color: #eafcff;
-  font-size: 0.64rem;
+  font-size: 0.73rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1968,7 +1982,7 @@ html.has-project-window .to-top {
 
 .diver__tag-index {
   color: #93edff;
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -2026,14 +2040,14 @@ html.has-project-window .diver {
 
   .dock__list {
     flex-direction: row;
-    gap: 0.45rem;
-    padding: 0.45rem;
+    gap: min(0.45rem, 7px);
+    padding: min(0.45rem, 7px);
     border-radius: 1.4rem;
   }
 
   .dock__link {
-    width: 2.85rem;
-    height: 2.85rem;
+    width: min(2.85rem, 52px);
+    height: min(2.85rem, 52px);
   }
 
   .dock__icon {
@@ -2041,8 +2055,8 @@ html.has-project-window .diver {
   }
 
   .dock__icon svg {
-    width: 1.45rem;
-    height: 1.45rem;
+    width: min(1.45rem, 24px);
+    height: min(1.45rem, 24px);
   }
 
   .dock__item::after {
@@ -2095,5 +2109,49 @@ html.has-project-window .diver {
 @media (min-width: 90em) and (min-height: 48em) and (max-height: 56.24em) {
   .dock {
     top: calc(50% - 6.625rem);
+  }
+}
+
+/* ---------- Lisibilité : la faune passe derrière les textes ---------- */
+/* Les poissons 3D nagent entre le lecteur et la copie. Sur les zones claires,
+   un halo clair garde le texte sombre lisible quand un requin traverse une
+   ligne, sans changer la composition sur fond d'eau libre. */
+#top h1,
+#top p,
+#projects h2,
+#projects .section-lede {
+  text-shadow:
+    0 0 0.22em rgba(236, 250, 255, 0.9),
+    0 0 0.05em rgba(236, 250, 255, 0.75),
+    0 1px 2px rgba(0, 8, 14, 0.3);
+}
+
+/* ---------- Téléphone en paysage (hauteur courte) ---------- */
+/* Centrer un héros de 450 px dans 390 px de haut le fait passer sous le dock
+   fixe. On réduit l'avatar, les titres et le corail, et on réserve la hauteur
+   du dock dans le bas de chaque zone. */
+@media (max-height: 31em) and (max-width: 63.99em) {
+  .zone {
+    padding-top: 1.25rem;
+    padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+  }
+
+  .avatar {
+    width: clamp(88px, 26vh, 132px);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 { font-size: clamp(1.9rem, 11vh, 2.9rem); }
+  h2 { font-size: clamp(1.6rem, 9vh, 2.4rem); }
+
+  .zone p {
+    margin-top: 0.6rem;
+    font-size: clamp(0.95rem, 2.6vh, 1.05rem);
+    line-height: 1.4;
+  }
+
+  .reef-corner {
+    width: clamp(150px, 34vw, 220px);
+    opacity: 0.85;
   }
 }

@@ -109,8 +109,16 @@ cover graph from the SAÉ report (`image/sae-exploration-algo.png`); the
 report (`image/biosphere-board.png`). The `nextcloud` screen is a carousel of
 three screenshots from the SAE network report (`image/nextcloud-vm.webp`,
 `image/nextcloud-install.webp`, `image/nextcloud-apps.webp`), cycled with the
-arrows inside the project window. The layout is built for four projects; a fifth
-needs a new slot in `src/drone-fleet.js`.
+arrows inside the project window.
+
+The fleet follows the data: `slotLayout()` in `src/drone-fleet.js` derives the
+slot count from `PROJECTS`. Four projects keep the hand-tuned composition (two
+rows of two on phone and tablet, one row of four on desktop); extra projects are
+spread evenly, so a fifth or sixth drone lands in the same rows on narrow
+screens and widens the desktop row. Each row gets its own anchor, measured in
+pixels from the section's natural height, so the cards keep their spacing while
+the section grows. `drone.variant` still selects one of four procedural fan
+layouts, so a fifth drone reuses an existing fan.
 
 The drones respect `prefers-reduced-motion`: no idle drift, no rotor spin, and
 shorter window transitions.
@@ -152,3 +160,22 @@ items, so the "24 compétences" line follows the data.
 
 A logo must be a single-colour SVG: it is drawn as a CSS mask over the card's
 background, so it is always painted in the theme colour instead of its own.
+
+## Responsive behaviour
+
+The layout is audited from 280 px to 2560 px wide, with no horizontal overflow
+at any size, no clipped text, and 44 px minimum targets on every dock link,
+project card and chip.
+
+Short viewports (landscape phones, under 31rem tall) switch the hero to a
+compact scale — smaller avatar, tighter rhythm, 5.25rem bottom padding for the
+dock — so the paragraph and the dock never share the same pixels. The dock, the
+back-to-top button and the section eyebrow are capped in pixels as well as in
+rem, so a 200 % browser text zoom enlarges the copy without pushing the fixed
+chrome off screen. Pinch-zoom stays enabled; `touch-action` is only opted out on
+the drone hotspots, which own their drag. Display type is capped by `vw` and
+body text can break a long word, so a single word cannot outgrow its column.
+Headings and the project lede carry a light halo so the dark 3D fish passing
+behind them cannot erase the contrast, and the sardine/mackerel counts follow a
+`matchMedia("(max-width: 767.98px)")` listener, in sync with the 768 px CSS
+boundary.

@@ -438,7 +438,10 @@ export function createDroneFleet({ scene, camera, projects, projectWindow }) {
     const height = Math.max(110, bottom - top);
     let left = centerX - width / 2;
     const dockClearance = vw >= 1024 ? 100 : 8;
-    left = clamp(left, 8, vw - width - dockClearance);
+    // On very narrow screens the label can be wider than the free space; the
+    // upper bound must not drop below the lower one, and the layer clips the
+    // remainder instead of growing the document.
+    left = clamp(left, 0, Math.max(0, vw - width - dockClearance));
     // Keep the transparent hit area on the 3D label. The slot fractions keep
     // the cards above the bottom dock, so clamping vertically here would only
     // detach the button from the hologram it is meant to cover.
